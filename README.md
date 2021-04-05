@@ -18,4 +18,6 @@ nouvelles formes de bloc pour créer des fuselages.
 
 commerce entre secteur, achat vente de marchandise, mission, pirate
 
-![Screenshot](https://github.com/cpc6128-fr/spacengine/screenshot.png)
+![Screenshot](https://github.com/cpc6128-fr/spacengine/spacengine_system.png)
+
+![Screenshot](https://github.com/cpc6128-fr/spacengine/space.png)
