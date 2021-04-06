@@ -17,7 +17,7 @@ spacengine.can_dig=function(pos,player)
   local node=minetest.get_node(pos)
   local group=minetest.get_item_group(node.name,"spacengine")
   local check,tool=spacengine.owner_check(player,pos)
-
+minetest.log(check.." "..tool)
   if group==1 then
 
     --only captain can be destruct
@@ -92,7 +92,11 @@ spacengine.rightclick=function(pos, node, player, maj)
 
     if minetest.get_item_group(node.name,"spacengine")==12 then
       if maj then
-        spacengine.chg_form[plname].option="-&"
+        if node.name=="monitor:screen_led" then
+          spacengine.chg_form[plname].option="-&led"
+        else
+          spacengine.chg_form[plname].option="-&"
+        end
         return spacengine.formspec_update(pos,player) -- screen bloque maj
       else
         spacengine.chg_form[plname].option="-"

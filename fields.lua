@@ -2,6 +2,7 @@
 
 --**function local**
 
+--from jumpdrive
 local function write_book(cpos,nod_met,plname)
 	local inv = nod_met:get_inventory()
 
@@ -73,9 +74,15 @@ local function read_book(nod_met,channel)
     spacengine.area[channel].config[1][6][3]=data.z
 
 		-- put book back
-		inv:add_item("book", stack)
+    if inv:room_for_item("stock", stack) then
+			-- put written book back
+			inv:add_item("stock", stack)
+		else
+			-- put back old stack
+			inv:add_item("book", stack)
+		end
+		
     spacengine.save_area()
-    minetest.chat_send_player(player_name, "New Coordinate OK")
 	end
 end
 
@@ -137,7 +144,8 @@ local function accept_upgrade(cpos,nod_met,spac_eng,group,idx2)
 
       if group==1 then
         local data=spacengine.decompact(spacengine.upgrade[group][idx2][4])
-        if spacengine.check_free_place(cpos, "", data[4], {"espace:bedrock", "espace:invisible_bedrock"})~=true then return false end
+        if spacengine.check_free_place(cpos, "", data[4], {"espace:bedrock", "espace:invisible_bedrock"})~=true then
+        return false end
       end
 
       if group==3 then
@@ -279,13 +287,14 @@ local chg_shipname=function(pos,player,old_channel,new_channel,nod_met)
   if string.find(old_channel,"No channel:") then     
     --add new vaisseaux
     player:set_attribute("vaisseaux",vaisseaux .. new_channel ..":")
+
   else
 
     --remove vaisseaux du vendeur
     if spl_cha[2]==new_name then
       vaisseaux=string.gsub(vaisseaux,spl_cha[1]..":","")
-    else
 
+    else
       if spl_cha[2]~="ship_dealer" then
       local player2=minetest.get_player_by_name(spl_cha[2])
       local vaisseaux2=player2:get_attribute("vaisseaux")
@@ -294,6 +303,7 @@ local chg_shipname=function(pos,player,old_channel,new_channel,nod_met)
       player2:set_attribute("vaisseaux",vaisseaux2)
       end
     end
+
     --remove oldship
     spacengine.test_area_ship(pos,-1,old_channel)
     
@@ -301,11 +311,12 @@ local chg_shipname=function(pos,player,old_channel,new_channel,nod_met)
     if new_channel=="No channel" then
       player:set_attribute("vaisseaux",vaisseaux)
       err=true
-    else
 
+    else
       --add vaisseaux acheteur
       player:set_attribute("vaisseaux",vaisseaux .. new_channel ..":")
     end
+
   end
 
   nod_met:set_string("channel",new_channel ..":".. new_name)
@@ -390,7 +401,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
       end
 
       if spacengine.transaction(spacengine.area[channel].captain,nil,price) then
-        spacengine.maj_pos_node(nod_pos,plname,channel,1)
+        spacengine.maj_pos_node(nod_pos,plname,channel,2)
       end
 
     --jumpdrive
@@ -422,12 +433,15 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 
       --add crew
       if fields.crew2~="" then
-        if spacengine.area[channel].crew[fields.crew2]==nil then
-          spacengine.area[channel].crew[fields.crew2]=false
-          spacengine.save_area()
+        if minetest.get_player_by_name(fields.crew2) then
+          if spacengine.area[channel].crew[fields.crew2]==nil then
+            spacengine.area[channel].crew[fields.crew2]=false
+            spacengine.save_area()
+          end
         end
       end
 
+      --priv crew
       if fields.crew3~="" then
         if spacengine.area[channel].crew[fields.crew3]~=nil then
           if spacengine.area[channel].crew[fields.crew3]==false then
@@ -468,7 +482,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 
       spacengine.chg_form[plname]=nil
       return
-
+--[[
     --accept new spaceship
     elseif string.find(spacengine.chg_form[plname].option,"+7") then
       local choice=tonumber(form_spl[3])
@@ -480,11 +494,16 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
       if spacengine.check_free_place(newpos,plname,spacengine.vaisseaux[choice])~=true then return end
 
       if spacengine.transaction(player,nil,spacengine.vaisseaux[choice][4]) then
+        --remove node spacengine achat
         minetest.remove_node(cpos)
+
         spacengine.place_ship(newpos, plname, cha_spl[1]..":"..plname, spacengine.vaisseaux[choice])
+        --add new area for spaceship
         spacengine.test_area_ship(newpos,1,cha_spl[1]..":"..plname,plname)
---maj
+        --maj
+        spacengine.maj_pos_node(newpos,plname,cha_spl[1]..":"..plname,0)
       end
+--]]
 
     elseif string.find(spacengine.chg_form[plname].option,"+8") then
 
@@ -503,6 +522,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
   end
 
   --** MaJ en quittant **
+  -- maj avec touche enter
   if fields.key_enter_field then
     if fields.key_enter_field=="channel" then
       fields.maj=""
@@ -514,30 +534,36 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
     if group==1 then
 
       --change channel name
-      if string.find(channel,fields.channel) then
-        -- si ancien channel existe
+      if string.find(channel,fields.channel) then --same name
+        -- si ancien channel existe et different de no channel
         if not string.find(channel,"No channel:") then
           spacengine.maj_pos_node(nod_pos,plname,channel,0)
         end
-      else
 
+      --si name different
+      else
         local vaisseaux=player:get_attribute("vaisseaux")
         if vaisseaux==nil then vaisseaux="" end
+        --arret du controler
+        local timer=minetest.get_node_timer(nod_pos)
 
-        if not string.find(vaisseaux,fields.channel) then
+        if timer:is_started() then timer:stop() end
 
-          if fields.channel~="No channel" and spacengine.check_free_place(nod_pos,plname,spac_eng[4],{"espace:bedrock", "espace:invisible_bedrock"})~=true then return end
-          --arret du controler
-          local timer=minetest.get_node_timer(nod_pos)
+        if fields.channel=="No channel" then
+          chg_shipname(nod_pos,player,channel,fields.channel,nod_met)
+          spacengine.maj_channel(nod_pos,fields.channel..":"..plname,1)
+          --spacengine.maj_pos_node(nod_pos,plname,fields.channel..":"..plname,1)
 
-          if timer:is_started() then timer:stop() end
+        else
+          if spacengine.check_free_place(nod_pos,plname,spac_eng[4],{"espace:bedrock", "espace:invisible_bedrock"})==false then return end
 
           chg_shipname(nod_pos,player,channel,fields.channel,nod_met)
           spacengine.maj_pos_node(nod_pos,plname,fields.channel..":"..plname,0)
         end
+        
       end
-
       return
+
     else
       spacengine.maj_pos_node(nod_pos,plname,channel,0)
       return
@@ -567,13 +593,13 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
     spacengine.chg_form[plname].option="+4"
     return spacengine.formspec_update(nod_pos,player)
   end
-
+--[[
   --** commerce **
   if fields.commerce then
     spacengine.chg_form[plname].option="+6"
     return spacengine.formspec_update(nod_pos,player)
   end
-
+--]]
   --** installation Upgrade **
   if fields.upgrade then
     if string.find(fields.upgrade,"DCL:") then

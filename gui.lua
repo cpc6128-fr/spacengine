@@ -209,7 +209,7 @@ spacengine.formspec_update=function(pos,player,value)
 
     --reparation
     elseif string.find(option,"+2") and spacengine.chg_form[plname].check>2 then
-      local calcul=math.ceil(config[1][3]*config[1][3]*tonumber(string.sub(config[1][4],8,11))*0.0002)+(config[5][1]-config[5][4])
+      local calcul=math.ceil(config[1][3]*config[1][3]*tonumber(string.sub(config[1][4],11,15))*0.0002)+(config[5][1]-config[5][4])
       if string.find(option,"patrol") then
         formspec="size[5,3]button_exit[0,0;2,1;accept;accept]button_exit[0,1;2,1;cancel;cancel]label[1,2;Call protection patrol]label[1,2.5;Price : ".. (calcul*100) .."]"
       else
@@ -238,14 +238,14 @@ spacengine.formspec_update=function(pos,player,value)
 
       formspec=formspec.."field[0.1,2.5;5,1;data1;Sell Price ;".. vente .."]field[0.1,3.5;5,1;crew1;Remove crew ;]field[0.1,4.5;5,1;crew2;Insert crew ;]field[0.1,5.5;5,1;crew3;Privilege crew ;]"
 
-    --transaction accept ?
+    --[[transaction accept ?
     elseif string.find(option,"+6") then
       formspec="size[6,4]button_exit[0,0;2,1;accept;accept]button_exit[0,1;2,1;cancel;cancel]"
 
     --accept achat nouveau vaisseaux
     elseif string.find(option,"+7") then
       formspec="size[5,3]button_exit[0,0;2,1;accept;accept]button_exit[0,1;2,1;cancel;cancel]label[2.5,0;Spaceship "..spacengine.vaisseaux[tonumber(spacengine.chg_form[plname].idx)][5].."]label[2.5,1;Price : "..spacengine.vaisseaux[tonumber(spacengine.chg_form[plname].idx)][4].."]"
-
+--]]
     --New msg
     elseif string.find(option,"+8") then
       local nb_msg=string.split(config[13][9],";")
@@ -309,10 +309,11 @@ spacengine.formspec_update=function(pos,player,value)
       formspec=formspec.."image_button[9.15,9.4;1,1;spacengine_repar.png;repar;]"
     end
 
+    formspec=formspec.."background[4,0;6,6;spacengine_"..module[group]..".png]"
+
     if commerce=="s" or commerce=="y" then
       local split_up=spacengine.upgrade[group]
-      formspec=formspec.."background[4,0;6,6;spacengine_"..module[group]..".png]"
-
+      
       --upgrade activer ?
       if string.find(option,"&")==nil then
         formspec=formspec.."textlist[3.5,6.25;5.8,1.3;upgrade;"
@@ -480,14 +481,6 @@ spacengine.formspec_update=function(pos,player,value)
   elseif group==6 or scr_opt=="W" then
     if scr_opt~="W" then
       formspec=formspec.."label[0,3.5;Power : "..spac_eng[4].."]label[0,4;Range : "..spac_eng[5].."]label[0,4.5;Speed : "..spac_eng[6].."]"
-    end
-    if err==false then
-      --formspec=formspec.."field[4.3,1.75;2,1;data1;Puissance;".. config[6][2] .."]field[4.3,3;2,1;data2;Range;".. config[6][4] .."]field[6.5,1.75;3,1;data3;COORDO;".. config[4][4][1] .." ".. config[4][4][2] .." ".. config[4][4][3] .." ".. config[4][4][4] .."]"
-      --if config[6][6]==0 then
-      --  formspec=formspec.."button_exit[6.5,4.15;3,1;jump;WEAPONS FIRE]"
-      --else
-      --  formspec=formspec.."label[6.5,4.15;>WAIT<]" 
-      --end
     end
 
   --*************

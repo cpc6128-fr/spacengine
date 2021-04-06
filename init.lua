@@ -131,7 +131,7 @@ minetest.register_node("spacengine:builder", {
 		meta:set_string("formspec", spc_formspec)
 		meta:set_string("infotext", "spacengine Dealer")
 	end,
---
+--[[
   on_punch=function(pos,node,player)
     local meta = minetest.get_meta(pos)
     meta:set_string("formspec", spc_formspec)
@@ -197,6 +197,7 @@ end)
 spacengine.read_area()
 --
 --*** init position ***
+--[[
 minetest.register_lbm({
 name="spacengine:change_area_controler",
 nodenames = {"spacengine:controler"},
@@ -222,6 +223,7 @@ action = function(pos,node)
   end
 end
 })
+--]]
 
 local function spaceship_dealer(channel,idx)
 local formspec= "size[9,5]button_exit[0,4;2,1;cancel;cancel]field[0.25,0;3,1;channel;;".. channel .."]label[2,1;Spaceship list]textlist[2,1.5;6,1.3;achat;"

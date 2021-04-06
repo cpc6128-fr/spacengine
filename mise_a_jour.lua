@@ -121,8 +121,6 @@ spacengine.maj_channel=function(cpos,channel,repar) --repar 0 normal 1 reset 2 r
 
   local cont_spac=spacengine.decompact(controler:get_string("spacengine"))
 
-  local config=spacengine.area[channel].config
-
   local rangex=tonumber(string.sub(cont_spac[4],2,3))
   local rangey=tonumber(string.sub(cont_spac[4],5,6))
   local rangez=tonumber(string.sub(cont_spac[4],8,9))
@@ -130,6 +128,28 @@ spacengine.maj_channel=function(cpos,channel,repar) --repar 0 normal 1 reset 2 r
   --controler center
   local list=minetest.find_nodes_in_area({x=cpos.x-rangex,y=cpos.y-rangey,z=cpos.z-rangez},{x=cpos.x+rangex,y=cpos.y+rangey,z=cpos.z+rangez},"group:spacengine")
   local nb=#list
+
+  if repar==1 then
+    for i=1,nb do
+      local dst=minetest.get_node(list[i])
+      local dst_met=minetest.get_meta(list[i])
+      local dst_group=minetest.get_item_group(dst.name,"spacengine")
+
+      dst_met:set_string("channel",channel)
+
+      --calcul position relative
+      if dst_group==1 then
+        dst_met:set_string("pos_cont",minetest.pos_to_string({x=cpos.x,y=cpos.y,z=cpos.z}))
+      else
+        dst_met:set_string("pos_cont",minetest.pos_to_string({x=33333,y=0,z=0}))
+        dst_met:set_string("channel","No channel:noplayer")
+      end
+    end
+
+    return
+  end
+
+  local config=spacengine.area[channel].config
 
   --reset compteur
   local idx4,idx5,idx6=0,0,0
@@ -390,12 +410,7 @@ if config[4][8]==nil then config[4][8]=0 end
       prelativ={x=cpos.x,y=cpos.y,z=cpos.z}
     end
 
-    if repar==1 then
-      dst_met:set_string("pos_cont",minetest.pos_to_string({x=33333,y=0,z=0}))
-      dst_met:set_string("channel","No channel:noplayer")
-    else
-      dst_met:set_string("pos_cont",minetest.pos_to_string(prelativ))
-    end
+    dst_met:set_string("pos_cont",minetest.pos_to_string(prelativ))
     
     if sauvegarde then --sauvegarde nouvelle donnée du module
       dst_met:set_string("spacengine",spacengine.compact(dst_space))

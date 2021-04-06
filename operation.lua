@@ -1140,7 +1140,7 @@ spacengine.manutention=function(pos,cont_met,config,channel)
         return "MAP ERROR"
       end
 
-      if node.name=="air" or node.name=="vacuum:vacuum" then --build only if place
+      if node.name=="air" or node.name=="vacuum:vacuum" then --build only si de la place
 
         err=0
         if data_cible[6]~="0" then

@@ -37,11 +37,13 @@ spacengine.owner_check=function(player,pos,channel,vente)
     local captain=nod_met:get_string("captain")
     --check si controler et capitaine
     if captain and plname==captain then return 4,tool end
+
+    if spacengine.test_area_ship(pos,0) then return 1,tool end
     out=1
   end
 
   --check si vaisseaux existe
-  if spacengine.area[channel]==nil then return 1,tool end
+  if spacengine.area[channel]==nil then return 3,tool end
 
   if spacengine.area[channel].crew[plname] then
     --check si privilege
