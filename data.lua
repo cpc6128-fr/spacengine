@@ -45,17 +45,17 @@ spacengine.upgrade={
 --power
 {
 {"1A",0,"Generator Charcoal","*¨100¨0¨250¨^default:coal_lump¨^battery¨10¨0¨0¨0","Generateur utilisant le charbon, il produit 250 U : 10 cycles 100Kg"},
-{"1B",4000,"Generateur Hydrogene","*¨150¨0¨500¨^spacengine:hydrogene_tank¨^battery¨15¨0¨0¨0","Generateur utilisant l'Hydrogene, production 500 U : 15 cycles 150Kg"},
+{"1B",4000,"Generator Hydrogen","*¨150¨0¨500¨^spacengine:hydrogene_tank¨^battery¨15¨0¨0¨0","Generateur utilisant l'Hydrogene, production 500 U : 15 cycles 150Kg"},
 {"1C",5000,"Generator petrol","*¨200¨0¨1000¨^espace:petrol_can¨^battery¨25¨0¨0¨0","Generateur utilisant du petrole, apporte une puissance de 1000 U / 25 Cycles. 200Kg"},
 {"1D",5500,"Solar panel","*¨100¨0¨150¨^solar¨^battery¨10¨0¨0¨0","Generateur a energie solaire, produit jusqu'a 150 U en plein soleil 150Kg"},
-{"1E",75000,"Nuclear system","*¨2500¨0¨2500¨^technic:uranium_block¨^battery¨150¨0¨0¨0","Nuclear reactor, generer de l'energie depuis l'uranium, grande puissance pendant longtemps, 2500 U : 150 cycles, son poids est problematique 2500 Kg"},
+{"1E",75000,"Generator Nuclear","*¨2500¨0¨2500¨^technic:uranium_block¨^battery¨150¨0¨0¨0","Nuclear reactor, generer de l'energie depuis l'uranium, grande puissance pendant longtemps, 2500 U : 150 cycles, son poids est problematique 2500 Kg"},
 {"1F",2500,"Hydrogen","*¨200¨0¨-20¨^default:water_source¨^spacengine:hydrogene_tank¨20¨0¨0¨0","Fabriquer de l'hydrogene c'est possible a partir de l'electrolyse de l'eau, consomme -20 U / 20 cycles pour produire 1 bouteille d'hydrogene 200Kg"},
 {"1G",2500,"Oxygen","*¨200¨0¨-4¨^default:water_source¨^spacengine:oxygene_tank¨10¨0¨0¨0","Besoin d'air, cette option est pour vous, le generateur utilise de l'eau et consomme -4 U / 10 cycles par bouteille d'oxygene 200Kg"},
 {"1H",2500,"Water","*¨200¨0¨0¨^solar¨^default:water_source¨50¨0¨0¨0","Produire de l'eau a partir du soleil c'est simple mais long : 50 cycles. systeme qui ne consomme pas d'energie de la battery 200Kg"},
-{"1I",4000,"Hydra generator","*¨300¨0¨150¨^water¨^battery¨2¨0¨0¨0","Une generatrice a eau, immerger elle produit jusqu'a 150 U par cycle"},
+{"1I",4000,"Generator Hydra","*¨300¨0¨250¨^water¨^battery¨2¨0¨0¨0","Une generatrice a eau, immerger elle produit jusqu'a 250 U par cycle"},
 {"1J",1500,"Biofuel","*¨300¨0¨-5¨^group:leave¨^biofuel:fuel_can¨10¨0¨0¨0","Transforme des feuilles en carburant Biofuel, consomme 5 U par cycle et genere en 10 cycles une bouteille de Biofuel 300Kg"},
 {"1K",3000,"Generator Biofuel","*¨100¨0¨100¨^biofuel:fuel_can¨^battery¨10¨0¨0¨0","Generateur utilisant le Biofuel, il produit 100 U / 10 cycles 100Kg"},
-{"1L",150000,"AntiMatiere Energy","*¨10000¨0¨10000¨^espace:antimatiere¨^battery¨300¨0¨0¨0","AntiMatiere Energy, generer de l'energie depuis l'antimatiere, 10000 U : 300 cycles, 10000 Kg"}
+{"1L",150000,"Generator AntiMatiere","*¨10000¨0¨10000¨^espace:antimatiere¨^battery¨300¨0¨0¨0","AntiMatiere Energy, generer de l'energie depuis l'antimatiere, 10000 U : 300 cycles, 10000 Kg"}
 },
 --engine
 {
@@ -154,7 +154,7 @@ spacengine.upgrade={
 {"1i",0,"Info","*¨*¨0¨^bm0bm0bm0bm0bm0¨1¨^A00051129023B00021000095C00021000013D00021000095E00031000512¨0¨0¨0¨0¨0",""},
 {"1O",0,"Oxygene","*¨*¨0¨^aG0bf0bM0¨1¨^A",""},
 {"1M",0,"Manutention","*¨*¨0¨^bE0bc0bs0aH0aI0bM0bg0bp0bh0¨1",""},
-{"1A",0,"SWITCH","*¨*¨0¨^iw0iT0iB0iB0iB0iB0iC0¨1¨^DOOR_IN\nATC\nSAS_OUT\nSTORAGE\nHANGAR\nAUX\nLIGHT",""},
+{"1A",0,"SWITCH","*¨*¨0¨^iw0iT0iB0iB0iB0iE0iC0¨1¨^DOOR_IN\nATC\nSAS_OUT\nSTORAGE\nHANGAR\nALARM\nLIGHT",""},
 {"1D",0,"ANALOG","*¨*¨0¨^aA0aC0aB0aE0aF0aG0aD0¨1",""},
 {"1F",0,"COORDO","*¨*¨0¨^ax0ay0az0aI0bM0",""}
 },

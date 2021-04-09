@@ -116,7 +116,7 @@ return src,calcul
 end
 
 --
-spacengine.maj_channel=function(cpos,channel,repar) --repar 0 normal 1 reset 2 reparation
+spacengine.maj_channel=function(cpos,channel,repar) --repar 0 normal 1 reset 2 reparation 3 power on/off
   local controler=minetest.get_meta(cpos)
 
   local cont_spac=spacengine.decompact(controler:get_string("spacengine"))
@@ -146,6 +146,52 @@ spacengine.maj_channel=function(cpos,channel,repar) --repar 0 normal 1 reset 2 r
       end
     end
 
+    return
+  --on/off power
+  elseif repar==3 then
+    local config=spacengine.area[channel].config
+    local cont1,cont2
+
+    if type(config[3][4])=="table" then
+      cont1=config[3][4]
+      cont2=config[3][5]
+      if cont2[1]==1 then --reset list
+        cont1={0}
+        cont2={0}
+      end
+    else
+      cont1={0}
+      cont2={0}
+    end
+
+    for i=1,nb do
+      local dst=minetest.get_node(list[i])
+      local dst_met=minetest.get_meta(list[i])
+      local dst_group=minetest.get_item_group(dst.name,"spacengine")
+
+      --calcul position relative
+      if dst_group==3 then
+        local dst_space=spacengine.decompact(dst_met:get_string("spacengine"))
+        local err=false
+        for j=1,#cont1 do
+          if dst_space[1]==cont1[j] then --present ?
+            dst_space[8]=cont2[j]
+            err=true
+          end
+        end
+
+        if err==false then
+          local j=#cont1+1 
+          cont1[j]=dst_space[1]
+          cont2[j]=dst_space[8] --on/off
+        end
+
+        dst_met:set_string("spacengine",spacengine.compact(dst_space))
+      end
+    end
+
+    config[3][4]=cont1
+    config[3][5]=cont2
     return
   end
 
@@ -469,11 +515,11 @@ if config[4][8]==nil then config[4][8]=0 end
 
     --oxygene
     if idx11>1 then
-      config[11][1]=math.min(100,math.floor(config[11][1]/idx11))
+      --config[11][1]=math.min(100,math.floor(config[11][1]/idx11))
       config[11][3]=math.floor(config[11][3]/idx11)
     end
 
-    config[11][3]=math.min(9999,config[11][3])+(idx11*10000)
+    --config[11][3]=math.min(9999,config[11][3])+(idx11*10000)
 
     --manutention
     if idx13>1 then

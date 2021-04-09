@@ -142,12 +142,6 @@ local function accept_upgrade(cpos,nod_met,spac_eng,group,idx2)
     --si remplacement de l'upgrade
     if string.sub(spacengine.upgrade[group][idx2][1],1,1)=="1" then
 
-      if group==1 then
-        local data=spacengine.decompact(spacengine.upgrade[group][idx2][4])
-        if spacengine.check_free_place(cpos, "", data[4], {"espace:bedrock", "espace:invisible_bedrock"})~=true then
-        return false end
-      end
-
       if group==3 then
         spac_eng[1]=idx2
       else
@@ -375,11 +369,19 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
     --upgrade module
     if string.find(spacengine.chg_form[plname].option,"+1") then
       local price=spacengine.upgrade[group][spacengine.chg_form[plname].idx][2]
+      local err=false
 
-      if accept_upgrade(cpos,nod_met,spac_eng,group,spacengine.chg_form[plname].idx) then
+      if group==1 then
+        local data=spacengine.decompact(spacengine.upgrade[group][spacengine.chg_form[plname].idx][4])
+        if spacengine.check_free_place(cpos, "", data[4], {"espace:bedrock", "espace:invisible_bedrock"})~=true then
+        err=true end
+      end
 
-        if spacengine.transaction(spacengine.area[channel].captain,nil,price) then
-
+      if err==false then
+        local captain=false
+        if plname==spacengine.area[channel].captain then captain=true end
+        if spacengine.transaction(spacengine.area[channel].captain,nil,price,captain) then
+          accept_upgrade(cpos,nod_met,spac_eng,group,spacengine.chg_form[plname].idx)
           spacengine.maj_pos_node(nod_pos,plname,channel,0)
         end
       end
@@ -806,11 +808,12 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
       local config=spacengine.area[channel].config
       if config[3][5][tmp1]<1 then
         config[3][5][tmp1]=1
+        config[13][9]="2".. string.sub(config[13][9],2)
       else
         config[3][5][tmp1]=0
       end
       
-      spacengine.maj_pos_node(nod_pos,plname,channel,0)
+      spacengine.maj_channel(cpos,channel,3)
 
       end
       new_form=true

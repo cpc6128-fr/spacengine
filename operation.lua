@@ -531,12 +531,29 @@ spacengine.controler=function(pos,scr)
       local volume=tonumber(string.sub(config[1][4],8,9))+config[1][3]
       config[3][2]=config[3][2]-volume-config[4][2]
       config[2][2]=math.max(0,math.floor(config[2][2]-volume))
+
+      --gestion safe power
+      local p_state=string.sub(config[13][9],1,1)
+      --low bat < 10%
       if config[2][2]<(config[2][1]*0.1) then
-        if string.sub(config[13][9],1,1)=="0" then
+        if string.sub(config[13][9],1,1)~="1" then
           config[13][9]="1".. string.sub(config[13][9],2)
           spacengine.central_msg("LOW BAT.",config)
           spacengine.make_sound("alarm",config[15])
         end
+      --puissance a 75% remise en fonctionnement si arret
+      elseif config[2][2]<(config[2][1]*0.75) then
+        if string.sub(config[13][9],1,1)~="2" then
+          config[13][9]="2".. string.sub(config[13][9],2)
+          spacengine.make_sound("sonnerie_porte",config[15])
+        end
+      --full charge stop production
+      elseif config[2][2]==config[2][1] then
+        if string.sub(config[13][9],1,1)~="0" then
+          config[13][9]="0".. string.sub(config[13][9],2)
+          spacengine.make_sound("sonnerie_porte",config[15])
+        end
+
       end
     end
 
@@ -558,6 +575,7 @@ end
 --*************
 --*** power ***
 --*************
+--config[13][9] = 0 arret 1 low_bat 2 on
 spacengine.power=function(pos,nod_met,cont_met,config)
   local spac_eng=spacengine.decompact(nod_met:get_string("spacengine"))
   local pos_cont=minetest.string_to_pos(nod_met:get_string("pos_cont"))
@@ -565,22 +583,22 @@ spacengine.power=function(pos,nod_met,cont_met,config)
 
   if pos_cont.x==33333 then return end --controler invalid
 
-  if spac_eng[8]==1 and config[1][1]>0 then --power activer
+--  if config[1][1]>0 then --power activer
+
+    --mode safe state - arret production energie
+    if string.sub(config[13][9],1,1)=="0" and spac_eng[4]>0 then
+      return
+    end
+
+    --module arreter
+    if spac_eng[8]==0 then return end
 
     local time_release=spac_eng[9] --timer
 
     local cont_inv = cont_met:get_inventory()
     local capa,charg=config[2][1],config[2][2]
 
-    --mode safe state
-    if time_release<0 then
-      if charg<capa*0.75 and spac_eng[4]>0 then
-        time_release=-time_release
-          spacengine.make_sound("sonnerie_porte",config[15])
-      else
-        return
-      end
-    end
+    
 
     local damage=(100-config[1][3])*0.01
     local src=spac_eng[5]
@@ -593,11 +611,11 @@ spacengine.power=function(pos,nod_met,cont_met,config)
       if src=="solar" then
         local light=minetest.get_node_light({x=pos.x,y=pos.y+1,z=pos.z})
         if light==nil then light=0 end
-        if light>10 then coef=(light-10)*0.14 end
+        if light>8 then coef=(light-8)*0.15 end
 
       elseif src=="water" then
         local water=minetest.find_nodes_in_area({x=pos.x-1,y=pos.y-1,z=pos.z-1},{x=pos.x+1,y=pos.y+1,z=pos.z+1},{"default:water_flowing","default:river_water_flowing"})
-        if #water > 7 then coef=(#water-7)*0.05 end
+        if #water > 1 then coef=#water*0.05 end
 
       elseif src=="battery" then
         if charg-p>0 then
@@ -618,11 +636,9 @@ spacengine.power=function(pos,nod_met,cont_met,config)
       if dst=="battery" then --destination
         charg=math.min(capa,charg+(p*coef*damage))
         config[2][2]=math.floor(charg)
-        if charg==capa and spac_eng[4]>0 then
+        if charg==capa then
           config[13][9]="0".. string.sub(config[13][9],2)
           spacengine.make_sound("sonnerie_porte",config[15])
-          time_release=-time_release
-          
         end
       end
 
@@ -640,6 +656,8 @@ spacengine.power=function(pos,nod_met,cont_met,config)
       end
 
       if time_release==1 and dst~="battery" and coef>0 then --quand transformation terminer add to l'inventaire
+
+--TODO option 2 stack different ? creer hydrogen et oxygen a partir de l'eau
         if cont_inv:room_for_item("stock",spac_eng[6]) then
           if config[1][1]==1 then --only player spacengine
             cont_inv:add_item("stock",spac_eng[6])
@@ -681,7 +699,7 @@ spacengine.power=function(pos,nod_met,cont_met,config)
     spac_eng[9]=time_release
     
     nod_met:set_string("spacengine",spacengine.compact(spac_eng))
-  end
+ -- end
 
   return refresh_screen
 end
@@ -1451,7 +1469,7 @@ local blacklisted_pos_list = minetest.find_nodes_in_area(source_pos1, source_pos
 	--local t0 = minetest.get_us_time()
 
   --before jump change gravity to prevent falling
-  fxadd(player,"jumpdrive",4,0,0,10)
+  fxadd(player,"jumpdrive",6,0,0,10)
   espace.vacuum=false
 	-- actual move
 	jumpdrive.move(source_pos1, source_pos2, target_pos1, target_pos2)

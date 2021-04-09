@@ -26,13 +26,18 @@ spacengine.airstream_on=function(pos,rangex,rangey,rangez,chance)
   local data = vm:get_data()
   local viystride = emax.x - emin.x + 1
 
-  -- replace vaccum with air
+  -- replace vacuum with air
   for z = pos1.z, pos2.z do
     for y = pos1.y, pos2.y - 1 do
       local vi = area:index(pos1.x, y, z)
       for x = pos1.x, pos2.x do
-        if data[vi] == c_vacuum and math.random(1,chance)<10 then
-          data[vi] = c_air
+        
+        if data[vi] == c_vacuum or data[vi] == c_air then --data[vi] == c_vacuum and math.random(1,chance)<10 then
+          if math.random(chance)<20 then
+            data[vi] = c_air
+          else
+            data[vi] = c_vacuum
+          end
         end
         vi = vi + 1
       end
@@ -67,7 +72,7 @@ spacengine.airstream_off=function(pos,rangex,rangey,rangez)
   local data = vm:get_data()
   local viystride = emax.x - emin.x + 1
 
-  -- replace air by vaccum
+  -- replace air by vacuum
 
   for z = pos1.z, pos2.z do
     for y = pos1.y, pos2.y - 1 do
@@ -97,18 +102,20 @@ spacengine.oxygene=function(pos,config)
   local rangex=tonumber(string.sub(config[1][4],2,3))
   local rangey=tonumber(string.sub(config[1][4],5,6))
   local rangez=tonumber(string.sub(config[1][4],8,9))
-  local volume_module=math.floor(config[11][3]/10000)*config[11][1]*config[11][2]*0.01
-  local volume_vaisseaux=tonumber(string.sub(config[1][4],11,15))
-	local stack="spacengine:oxygene_tank ".. math.ceil(volume_module)
+  local volume_vaisseau=tonumber(string.sub(config[1][4],11,15))
+  local volume_oxy=math.min(99,config[11][1]*config[11][2]*0.01)
+	local stack="spacengine:oxygene_tank ".. math.ceil(volume_oxy)
 
   if config[11][4]==1 then
 
     if inv:contains_item("stock", stack) then
-      local chance=math.max(1,volume_vaisseaux-math.ceil(volume_module*250))
+      local chance=101-math.floor(((volume_oxy*250)/volume_vaisseau)*100)--math.max(1,volume_vaisseaux-math.ceil(volume_oxy*250))
+
       spacengine.make_sound("air_on",config[15],pos)
-      spacengine.airstream_on(pos,rangex,rangey,rangez,chance)
+      spacengine.airstream_on(pos,rangex,rangey,rangez,math.max(1,chance))
 
       if config[1][1]==1 then --only player spacengine
+        config[2][2]=math.max(0,math.floor(config[2][2]-(config[11][2]*config[11][1])))
         inv:remove_item("stock", stack)
       end
 

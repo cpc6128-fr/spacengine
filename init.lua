@@ -197,7 +197,7 @@ end)
 spacengine.read_area()
 --
 --*** init position ***
---[[
+--
 minetest.register_lbm({
 name="spacengine:change_area_controler",
 nodenames = {"spacengine:controler"},

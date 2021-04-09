@@ -1,4 +1,5 @@
 --ATC11="0000" 00=timer alea 00=choix message aleea
+--TODO correspondance fichier 00="decollage" pour plus de comprehension
 local atc={
 "0000","0000","02011210","0000","0404031413",
 "0602232207","031819","0000","052123","0621",
@@ -9,7 +10,7 @@ local atc={
 --*** TIMER ***
 -- son d'ambience, applique la gravitation artificiel, protege dans l'espace des radiation
 
-local mod_espace=minetest.get_modpath("espace")
+--local mod_espace=minetest.get_modpath("espace")
 --[[
 if not mod_espace then
 
@@ -65,14 +66,14 @@ end
 spacengine.environnement=function(player,delay)
   local pl_pos = player:getpos()
   local plname = player:get_player_name()
-  local g=1000
+  --local g=1000
   local bm="e" --biome
-  if mod_espace then
-      g=map_sky[espace.data[plname].skytype].physic.gravity*1000
+  --if mod_espace then
+      local g=map_sky[espace.data[plname].skytype].physic.gravity*1000
       espace.data[plname].radiation=map_sky[espace.data[plname].skytype].radiation
       espace.data[plname].biome=espace.data[plname].old_biome
       espace.data[plname].oxygen=map_sky[espace.data[plname].skytype].oxygen
-  end
+  --end
   --recherche area
   local found,cpos,ship_name=spacengine.test_area_ship(pl_pos,0)
   
@@ -101,11 +102,11 @@ spacengine.environnement=function(player,delay)
       --shield is on ?
       if config[5][2]>0 then
         table.insert(sound_on,"spacengine:shield")
-        if mod_espace then
+        --if mod_espace then
           local shield=math.floor(config[5][4]*config[5][2]/2000)
           espace.data[plname].radiation=math.max(0,espace.data[plname].radiation-shield)
           espace.data[plname].biome="n"
-        end
+        --end
         bm="n"
       end
 
@@ -117,12 +118,12 @@ spacengine.environnement=function(player,delay)
         g=math.ceil((config[8][2]*(config[8][1] % 1000))/volume_module)
       end
 
-      if mod_espace then
+      --if mod_espace then
         --oxygen ?
         if config[11][2]>0 or config[11][4]>0 then
           espace.data[plname].oxygen=true
         end
-      end
+      --end
       --search sound
       if delay>1 then
 
@@ -169,7 +170,7 @@ spacengine.environnement=function(player,delay)
 
   end
 
-  if mod_espace then
+  --if mod_espace then
     if default.player_attached[plname] then
       fxadd(player,"sit",5,0,0,0,11)
     else
@@ -183,7 +184,9 @@ spacengine.environnement=function(player,delay)
         espace.data[plname].bloc_protect=false
       end
     end
+--[[
   else
+
     if pl_pos.y>1007 and pl_pos.y<10208 then --TODO spacengine.ALTMIN ALTMAX ?
       if bm=="e" then
         local hp = player:get_hp()
@@ -193,6 +196,7 @@ spacengine.environnement=function(player,delay)
     else
       if not default.player_attached[plname] then player:set_physics_override({speed=1,jump=1,gravity=1}) end
     end
-  end
 
+  end
+--]]
 end

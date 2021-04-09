@@ -81,7 +81,7 @@ spacengine.formspec_update=function(pos,player,value)
 
   --** clic droit param **
   if string.find(option,"<") then
-
+    
     if string.find(channel,"No channel:") or cpos.x==33333 then return false end
 
     if config[1][1]==0 then return false end
@@ -94,6 +94,7 @@ spacengine.formspec_update=function(pos,player,value)
     config[12]=string.sub(spac_eng[1],1,1)
     minetest.sound_play("spacengine_key", {to_player = plname})
     return spacengine.controler(cpos,true) --maj screen
+
   end
 
   --** BP Tech4 **
@@ -392,23 +393,23 @@ spacengine.formspec_update=function(pos,player,value)
     if scr_opt~="P" then
       local src=spac_eng[5]
       local dst=spac_eng[6]
-      formspec=formspec.."label[0,3.5;Power : "..spac_eng[4].."]label[0,4;Speed : ".. spac_eng[7].."]image[6.5,2;1,1;spacengine_arrow.png]label[3.5,1.5;Power instant. module : ".. spac_eng[10].."]label[3.5,2;Timer : ".. spac_eng[9].."]"
+      formspec=formspec.."label[0,3.5;Power : "..spac_eng[4].."]label[0,4;Speed : ".. spac_eng[7].."]image[7,0;1,1;spacengine_arrow.png]label[5,0.25;P ".. spac_eng[10].."]label[4,1;Timer ".. spac_eng[9].."]"
       if src=="solar" then
-        formspec=formspec.."image[5.5,2;1,1;spacengine_solar.png]"
+        formspec=formspec.."image[4,0;1,1;spacengine_solar.png]"
       elseif src=="battery" then
-        formspec=formspec.."item_image_button[5.5,2;1,1;spacengine:battery;dst;]"
+        formspec=formspec.."item_image_button[4,0;1,1;spacengine:battery;dst;]"
       elseif src=="water" then
-        formspec=formspec.."image[5.5,2;1,1;spacengine_water.png]"
+        formspec=formspec.."image[4,0;1,1;spacengine_water.png]"
       elseif string.find(src,"group:") then
-        formspec=formspec.."label[5.5,2;".. src .."]"
+        formspec=formspec.."label[4,0;".. src .."]"
       else
-          formspec=formspec.."item_image_button[5.5,2;1,1;".. src ..";src;]"
+          formspec=formspec.."item_image_button[4,0;1,1;".. src ..";src;]"
       end
 
       if dst~="battery" then
-        formspec=formspec.."item_image_button[7.5,2;1,1;".. dst ..";dst;]"
+        formspec=formspec.."item_image_button[9,0;1,1;".. dst ..";dst;]"
       else
-        formspec=formspec.."item_image_button[7.5,2;1,1;spacengine:battery;dst;]"
+        formspec=formspec.."item_image_button[9,0;1,1;spacengine:battery;dst;]"
       end
     end
 
@@ -419,7 +420,7 @@ spacengine.formspec_update=function(pos,player,value)
       else
         tmp1=math.floor((config[2][2]/config[2][1])*100)
       end
-      formspec=formspec.."textlist[3.5,4;5.75,2;power#".. minetest.pos_to_string(cpos) ..";"
+      formspec=formspec.."textlist[4,2;5.75,2;power#".. minetest.pos_to_string(cpos) ..";"
       local phr="refresh list"
       local length=#config[3][4]
       if type(config[3][4])=="table" then
@@ -445,7 +446,7 @@ spacengine.formspec_update=function(pos,player,value)
       else
         formspec=formspec.."Refresh list"
       end
-      formspec=formspec..";1;]label[3.5,3;Power Moy. : ".. config[3][3].."]label[3.5,2.5;Bat. level ".. tmp1 .." %]"
+      formspec=formspec..";1;]label[4,5.5;Power Moy. : ".. config[3][3].."]label[7.75,5.5;Bat. lvl ".. tmp1 .." %]"
       
     end
 
@@ -457,10 +458,13 @@ spacengine.formspec_update=function(pos,player,value)
     end
 
     if err==false then
-      local rmax=spacengine.conso_engine(cpos,config,1)
+      --local rmax=spacengine.conso_engine(cpos,config,1)
+      formspec=formspec.."label[4,0;Pmax ".. config[4][1] .."T]label[4,1;Range ".. config[4][3] .."]label[4,2;Cooler ".. config[4][5] .."°c]label[4,3;C ".. config[4][7] .."Kg]"
+--[[
       local secteur,bloc=espace.secteur(cpos)
-      formspec=formspec.."field[7.25,1;3,1;data3;bloc;"..bloc.nb+1 .."]field[4.25,1;3,1;data2;secteur;".. secteur.nb+1 .."]"..
-      "label[4,4;Xmin".. cpos.x-rmax .."]label[6,4;X".. cpos.x .."]label[8,4;Xmax".. cpos.x+rmax .."]label[4,5;Ymin".. cpos.y-rmax .."]label[6,5;Y"..cpos.y.."]label[8,5;Ymax".. cpos.y+rmax .."]label[4,6;Zmin".. cpos.z-rmax .."]label[6,6;Z"..cpos.z.."]label[8,6;Zmax".. cpos.z+rmax .."]"
+      formspec=formspec.."field[7.25,0;3,1;data3;bloc;"..bloc.nb+1 .."]field[4.25,0;3,1;data2;secteur;".. secteur.nb+1 .."]"..
+      "label[4,1;Xmin".. cpos.x-rmax .."]label[6,1;X".. cpos.x .."]label[8,1;Xmax".. cpos.x+rmax .."]label[4,2;Ymin".. cpos.y-rmax .."]label[6,2;Y"..cpos.y.."]label[8,2;Ymax".. cpos.y+rmax .."]label[4,3;Zmin".. cpos.z-rmax .."]label[6,3;Z"..cpos.z.."]label[8,3;Zmax".. cpos.z+rmax .."]"
+--]]
     end
 
   --**************
@@ -472,7 +476,7 @@ spacengine.formspec_update=function(pos,player,value)
     end
 
     if err==false then
-      formspec=formspec.."label[4,1.5;Regeneration : "..config[5][3].."]label[4,2;Shield : "..config[5][4].."]label[4,2.5;Protect total : "..config[5][1].."]"
+      formspec=formspec.."label[4,0;Regeneration : "..config[5][3].."]label[4,1;Shield : "..config[5][4].."]label[4,2;Protect total : "..config[5][1].."]"
     end
 
   --***************
@@ -483,6 +487,9 @@ spacengine.formspec_update=function(pos,player,value)
       formspec=formspec.."label[0,3.5;Power : "..spac_eng[4].."]label[0,4;Range : "..spac_eng[5].."]label[0,4.5;Speed : "..spac_eng[6].."]"
     end
 
+    if err==false then
+      formspec=formspec.."label[4,0;Power "..config[6][1].."]label[4,1;Range "..config[6][3].."]label[4,2;Reload ".. config[6][5]*5 .."S]label[4,3;Zone "..config[6][8].."]label[4,4;Nb weapons "..config[6][7].."]"
+    end
   --*************
   --*** radar ***
   --*************
@@ -491,6 +498,9 @@ spacengine.formspec_update=function(pos,player,value)
       formspec=formspec.."label[0,3.5;Range : ".. spac_eng[5].."]"
     end  
 
+    if err==false then
+      formspec=formspec.."label[4,0;Power "..config[6][1].."]label[4,1;Range "..config[6][3].."]label[4,2;Nb option ".. #config[7][5]-1 .."]"
+    end
   --*******************
   --*** gravitation ***
   --*******************
@@ -499,6 +509,9 @@ spacengine.formspec_update=function(pos,player,value)
       formspec=formspec.."label[0,3.5;G : ".. spac_eng[4].."]"
     end
 
+    if err==false then
+      formspec=formspec.."label[4,0;G max ".. math.floor(config[8][1] % 1000)/10 .."]label[4,5;Nb module ".. math.floor(config[8][1]/1000) .."]"
+    end
   --***************
   --*** oxygene ***
   --***************
@@ -507,6 +520,9 @@ spacengine.formspec_update=function(pos,player,value)
       formspec=formspec.."label[0,3.5;Stack AIR : ".. spac_eng[4].."]label[0,4;Speed : ".. spac_eng[5].."]"
     end
 
+    if err==false then
+      formspec=formspec.."label[4,0;Stack max ".. config[11][1] .."]label[4,5;Speed max ".. config[11][3] .."]"
+    end
   --************
   --*** info ***
   --************
@@ -514,7 +530,7 @@ spacengine.formspec_update=function(pos,player,value)
     if value==nil then value="0 0 0 0 0 0 - 0" end
     local val_spl=string.split(value," ")
     local sect=tonumber(val_spl[8])+1
-    formspec=formspec.."field[4.3,2.75;3,1;data4;Value;0]button[4.3,3.75;1,1;ok;OK]label[4.3,4.75;Sector : "..sect.." Matrice : "..val_spl[1].." "..val_spl[2].." "..val_spl[3].."]label[4.3,5.75;Astroport : "..val_spl[4].." "..val_spl[5].." "..val_spl[6].."]label[4.3,6.75;Planete : "..val_spl[7].."]"
+    formspec=formspec.."field[4.3,0.25;3,1;data4;;0]button[4.3,5;1,1;ok;OK]label[4.3,1.25;Sector : "..sect.." Matrice : "..val_spl[1].." "..val_spl[2].." "..val_spl[3].."]label[4.3,2.25;Astroport : "..val_spl[4].." "..val_spl[5].." "..val_spl[6].."]label[4.3,3.25;Planete : "..val_spl[7].."]"
 
   --****************
   --** LED SCROLL **
@@ -522,7 +538,7 @@ spacengine.formspec_update=function(pos,player,value)
   elseif group==12 and string.find(option,"led") then
 
     if spac_eng[6] then
-      formspec=formspec.."field[4.3,2.75;3,1;data1;Value;".. spac_eng[6] .."]"
+      formspec=formspec.."field[4.3,0.25;1,1;data1;;".. spac_eng[6] .."]"
     end
 
   end

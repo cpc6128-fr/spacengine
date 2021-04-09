@@ -105,7 +105,7 @@ spacengine.conso_engine=function(cpos,config,option)
   return conso,rmax,temperature,true
 end
 
-spacengine.transaction=function(player,stack,card)
+spacengine.transaction=function(player,stack,card,captain)
   local plname
   local inv
   local havecard
@@ -119,6 +119,8 @@ spacengine.transaction=function(player,stack,card)
     inv = player:get_inventory()
     havecard=commerce.found_item_index(player,"commerce:card")
   end
+  
+  if captain==true then havecard=1 end
 
   if havecard>0 then --si card presente
     if atm.balance[plname]~= nil then

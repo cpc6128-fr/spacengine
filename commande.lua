@@ -260,13 +260,14 @@ spacengine.bD=function(cpos,cont_met,config,spac_eng,channel,group,puncher,value
     if id<2 then id=2 end
     if config[3][5][id]<1 then
       config[3][5][id]=1
+      config[13][9]="2".. string.sub(config[13][9],2)
     else
       config[3][5][id]=0
     end
   end
   config[12]="e"
 
-  spacengine.maj_channel(cpos,channel,0)
+  spacengine.maj_channel(cpos,channel,3)
   return
 end
 

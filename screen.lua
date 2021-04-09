@@ -58,66 +58,69 @@ local function energy_total(config)
   return "(q(1*)"..string.sub(tostring(math.floor(u_t)+100000),2)..unit
 end
 
----- barre graphe horizontal **
-local function vumetre(value,value_max,color)
+--** barre graphe horizontal **
+local function vumetre(value,value_max,color,style_graph)
   local coef=100/value_max
   local case=math.min(10,math.floor((value*coef)/10))
   local barre=""
+
+  if style_graph==nil then style_graph=80 end
+
   if case>8 then
     if color then
-      barre="(h"..string.char(72+case)
+      barre="(h"..string.char(style_graph+case-8)
     else
-      barre=string.char(72+case)
+      barre=string.char(style_graph+case-8)
     end
     case=8
   else
     if color then
-      barre="(hP"..barre
+      barre="(h"..string.char(style_graph)..barre
     else
-      barre="P"..barre
+      barre=string.char(style_graph)..barre
     end
   end
 
   if case>6 then
     if color then
-      barre="(k"..string.char(74+case)..barre
+      barre="(k"..string.char(style_graph+case-6)..barre
     else
-      barre=string.char(74+case)..barre
+      barre=string.char(style_graph+case-6)..barre
     end
     case=6
   else
     if color then
-      barre="(kP"..barre
+      barre="(k"..string.char(style_graph)..barre
     else
-      barre="P"..barre
+      barre=string.char(style_graph)..barre
     end
   end
 
   if case>4 then
     if color then
-      barre="(k"..string.char(76+case)..barre
+      barre="(k"..string.char(style_graph+case-4)..barre
     else
-      barre=string.char(76+case)..barre
+      barre=string.char(style_graph+case-4)..barre
     end
     case=4
   else
     if color then
-      barre="(kP"..barre
+      barre="(k"..string.char(style_graph)..barre
     else
-      barre="P"..barre
+      barre=string.char(style_graph)..barre
     end
   end
 
   if case>2 then
-    barre=string.char(78+case)..barre
+    barre=string.char(style_graph+case-2)..barre
     case=2
   else
-    barre="P"..barre
+    barre=string.char(style_graph)..barre
   end
   if case>0 then
-    barre=string.char(80+case)..barre
+    barre=string.char(style_graph+case)..barre
   else
-    barre="P"..barre
+    barre=string.char(style_graph)..barre
   end
 
   if color then
@@ -131,6 +134,31 @@ local function vumetre(value,value_max,color)
       barre="(f"..barre
     end
   end
+
+  return barre
+end
+
+--VUMETRE 2
+local function vumetre2(value)
+  local barre=""
+  local lvl=math.floor(value/15)
+  local lng=lvl-1
+
+  if lvl>5 then
+    barre="(he"
+    lvl=5
+  end
+
+  if lvl>3 then
+    barre="(k".. string.rep("e",lvl-3) ..barre
+    lvl=3
+  end
+
+  if lvl>0 then
+    barre="(2(f".. string.rep("e",lvl) .. barre
+  end
+
+  barre=barre .."(o".. string.rep("d",5-lng) .."_)"
 
   return barre
 end
@@ -687,17 +715,21 @@ if string.find(bymodule,"O") or by_all then
       page=page.."(3?MENU=@)"
     end
 
-    local tmp1=math.floor((config[11][1]*config[11][2])/100)
-    local tmp2=math.floor(config[11][2]/15)+65
-    phr=page.." | (p(3?OXYGENE@(1_(i".. string.char(tmp2)
+    local tmp1=math.floor(config[11][2]/15)+65
+    phr=page.." | (p(3?OXYGENE@(1_(i".. string.char(tmp1)
     if config[11][2]>0 then
       phr=phr.."(f(3?ON=@)"
     else
       phr=phr.."(h(3?OFF@)"
     end
-    
-    local volume=math.ceil((tonumber(string.sub(config[1][4],11,15))*config[11][1]*config[11][2])/3000000)
-    phr=phr .." | (2(fR(1".. vumetre(config[11][4],config[11][3] % 1000,false) .."(2_(c:(1".. vumetre(tmp1,100,true) .." | (1(j&".. vumetre(volume,25,true) ..")(d".. volume .." | (oNb ".. math.floor(config[11][3]/10000) .."/(fS ".. (config[11][3] % 1000)
+
+    local volume_vaisseau=tonumber(string.sub(config[1][4],11,15))
+    local volume=math.min(99,config[11][1]*config[11][2]*0.01)
+    local volume_oxy=math.floor(((volume*250)/volume_vaisseau)*100)
+    local tmp2=99
+    if volume<30 then tmp2=30 end
+
+    phr=phr .." | (2(fR(1".. vumetre(config[11][4],config[11][3],false) .."(1_(c*".. vumetre(volume,config[11][1],true) .." | (1(j&".. vumetre(volume,tmp2,true) .."_)(i(3.".. math.ceil(volume) ..".) | (d(2:)".. volume_oxy .."% (f (2P)".. config[11][3]
 
   end
 end
@@ -912,7 +944,7 @@ if string.find(bymodule,"s") or by_all then
     end
 
     local vl=string.sub(nod_space[4],nb_param*3,nb_param*3)
-    phr=page.." | (p(3?STORAGE@(2_(w`(1(e_6)"..vl.."(12) | "
+    phr=page.." | (p(3?STORAGE@(2_(w`(1(e_6)".. vl+1 .."(12) | "
 
     if nod_space[5]==1 then
     phr=phr.."(o".. string.sub(tostring(storage[2]+1000000),2) .."/".. string.sub(tostring(storage[1]+1000000),2)
@@ -1002,22 +1034,22 @@ if string.find(bymodule,"A") or by_all then
   if scr_opt=="A" then
     
     if nod_space[5]==1 then
-      page=page.."DOOR_IN"
+      page=page.."(iDOOR_IN | (p(3?SWITCH@) | (1"
     elseif nod_space[5]==2 then
-      page=page.."ATC(1____)"
+      page=page.."ATC(1____) | (p(3?RADIO=ATC@) | (1"
     elseif nod_space[5]==3 then
-      page=page.."SAS_OUT"
+      page=page.."(iSAS_OUT | (p(3?KEYPAD@) | (1"
     elseif nod_space[5]==4 then
-      page=page.."STORAGE"
+      page=page.."(iSTORAGE | (p(3?KEYPAD@) | (1"
     elseif nod_space[5]==5 then
-      page=page.."HANGAR(1_)"
+      page=page.."(iHANGAR(1_) | (p(3?KEYPAD@) | (1"
     elseif nod_space[5]==6 then
-      page=page.."AUX(1____)"
+      page=page.."ALARM(1__) | (p(3?SIGNAL@) | (1"
     elseif nod_space[5]==7 then
-      page=page.."-LIGHT-"
+      page=page.."-LIGHT- | (p(3?NEON@) | (1"
     end
 
-    phr=page.." | (p(3?KEYPAD@) | (1"
+    phr=page
     local lign_up,lign_down="",""
     local value
     for nb_param=1, 7 do
@@ -1039,72 +1071,31 @@ end
 --************
 if string.find(bymodule,"D") or by_all then
   if scr_opt=="D" then
-    
+    phr="(p(3?ANALOG@)"
+
     if nod_space[5]==1 then
-      page=page.."(1'_)"
+      phr=phr.."(1(e'_"
     elseif nod_space[5]==2 then
-      page=page.."(1%_)"
+      phr=phr.."(1(h%_"
     elseif nod_space[5]==3 then
-      page=page.."(1`_)"
+      phr=phr.."(1(n`_"
     elseif nod_space[5]==4 then
-      page=page.."(1U_)"
+      phr=phr.."(1(pU_"
     elseif nod_space[5]==5 then
-      page=page.."G(1_)"
+      phr=phr.."(gG(1_"
     elseif nod_space[5]==6 then
-      page=page.."(2:_)"
+      phr=phr.."(c(2:_"
     elseif nod_space[5]==7 then
-      page=page.."(1%(mw)"
+      phr=phr.."(1(m%w"
     end
 
-    local lign_up=""
-    local lign_down=""
-    phr=page.." | (p(3?ANALOG@) | "
+    phr=phr.." | (e(1_'(2".. vumetre2(config[4][2]) .."(1(h%(2".. vumetre2(config[6][2])
 
-    if config[4][2]>0 then
-      lign_up=lign_up.."(f(1"..string.char(math.floor(config[4][2]/15)+65)
-    else
-      lign_up=lign_up.."(h(1A"
-    end
+    phr=phr.." | (n(1_`(2".. vumetre2(config[5][2]) .."(1(pU(2".. vumetre2(config[7][2])
 
-    if config[6][2]>0 then
-      lign_up=lign_up.."(f_"..string.char(math.floor(config[6][2]/15)+65)
-    else
-      lign_up=lign_up.."(h_A"
-    end
-
-    if config[5][2]>0 then
-      lign_up=lign_up.."(f_"..string.char(math.floor(config[5][2]/15)+65)
-    else
-      lign_up=lign_up.."(h_A"
-    end
-
-    if config[7][2]>0 then
-      lign_up=lign_up.."(f_"..string.char(math.floor(config[7][2]/15)+65)
-    else
-      lign_up=lign_up.."(h_A"
-    end
-
-    if config[8][2]>0 then 
-      lign_up=lign_up.."(f_"..string.char(math.floor(config[8][2]/15)+65)
-    else
-      lign_up=lign_up.."(h_A"
-    end
-
-    if config[11][2]>0 then 
-      lign_up=lign_up.."(f_"..string.char(math.floor(config[11][2]/15)+65)
-    else
-      lign_up=lign_up.."(h_A)"
-    end
-
-    phr=phr..lign_up.." | (1(p'_%_`_U_)G(2_:) | (1__"
-
-    if config[6][4]>0 then 
-      phr=phr .."(n_"..string.char(math.floor(config[6][4]/15)+65)
-    else
-      phr=phr .."(m_A"
-    end
-
-    phr=phr.."_________)"
+    phr=phr.." | (g G(2".. vumetre2(config[8][2]) .."(1(c(2:".. vumetre2(config[11][2])
+    
+    phr=phr.." | (m(1%w(2".. vumetre2(config[6][4]) .."(1________)"
   end
 end
 

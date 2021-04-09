@@ -94,6 +94,8 @@ spacengine.rightclick=function(pos, node, player, maj)
       if maj then
         if node.name=="monitor:screen_led" then
           spacengine.chg_form[plname].option="-&led"
+        elseif node.name=="monitor:screen_aim" then
+          spacengine.chg_form[plname].option="-&info"
         else
           spacengine.chg_form[plname].option="-&"
         end
@@ -628,6 +630,16 @@ minetest.register_node("spacengine:info", {
     if check<2 then return end
     
     local owner=puncher:get_player_name()
+    local nod_met = minetest.get_meta(pos)
+    local channel=nod_met:get_string("channel")
+    if string.find(channel,"No channel:") then return end
+
+    if spacengine.area[channel] and spacengine.area[channel].config[7][1]==0 then return end
+
+    if (spacengine.area[channel].config[2][2]-spacengine.area[channel].config[7][1])<0 then return end
+
+    spacengine.area[channel].config[2][2]=spacengine.area[channel].config[2][2]-spacengine.area[channel].config[7][1]
+
     local hud_inf={}
     --recherche position
     local nb,nb_player,nb_pirate=0,0,0
